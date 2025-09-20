@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The A's Tales</title>
+    <!-- Tailwind CSS CDN for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Softer, lighter background */
+            color: #334155; /* Soft charcoal text color */
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .documentation-icon-link.active .icon-container {
+            border-color: #3b82f6;
+            background-color: #e3f2fd;
+        }
+
+        /* Smooth scrolling for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Carousel specific styles */
+        .carousel-container {
+            /* Enable 3D transformations for children */
+            transform-style: preserve-3d;
+        }
+
+        .carousel-item {
+            transform: scale(0.8) blur(3px) translateZ(0); /* Default state for side images */
+            opacity: 0.6;
+            /* Smoother transition effect with cubic-bezier */
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.7s ease, filter 0.7s ease;
+            filter: blur(3px);
+            cursor: pointer;
+        }
+
+        .carousel-item.active {
+            /* Magnified, floating effect with subtle 3D translation */
+            transform: scale(1.2) translateZ(50px);
+            opacity: 1;
+            filter: blur(0);
+            z-index: 10;
+        }
+
+        .carousel-item.active img {
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3), 0 8px 12px -6px rgba(0, 0, 0, 0.2);
+            border: 4px solid #3b82f6;
+        }
+
+        .carousel-item-prev, .carousel-item-next {
+            transform: scale(0.9) blur(1px) translateZ(20px);
+            filter: blur(1px);
+            opacity: 0.8;
+            z-index: 5;
+        }
+
+        .carousel-item-prev img, .carousel-item-next img {
+            border: 2px solid #64748b;
+        }
+
+        /* 3D Icon section styles */
+        .icon-container {
+            position: relative;
+            perspective: 1000px;
+            text-align: center;
+        }
+        
+        .icon-item {
+            display: inline-block;
+            margin: 1rem;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-in-out;
+        }
+        
+        .icon-item:hover {
+            transform: translateY(-20px) rotateX(15deg) rotateY(15deg) scale(1.1);
+            z-index: 1;
+        }
+
+        .icon-wrapper {
+            background: #f1f5f9;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.1),
+                0 6px 6px rgba(0, 0, 0, 0.15),
+                inset 0 0 10px rgba(255, 255, 255, 0.5); /* Inner shadow for depth */
+            transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+            transform-style: preserve-3d;
+        }
+        
+        .icon-item:hover .icon-wrapper {
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.2),
+                0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-wrapper i {
+            font-size: 3.5rem;
+            color: #64748b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            transition: color 0.3s ease-in-out;
+        }
+        
+        .icon-item:hover .icon-wrapper i {
+            color: #3b82f6;
+        }
+
+        .icon-info {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            width: 200px;
+            padding: 0.75rem 1rem;
+            background: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            z-index: 10;
+        }
+        
+        .icon-item:hover .icon-info {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(10px);
+        }
+
+        /* Sticky Note Section Styles */
+        .sticky-note-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .sticky-note {
+            width: 200px;
+            height: 200px;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1), inset 0 0 5px rgba(255,255,255,0.5);
+            margin: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .sticky-note:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.2), inset 0 0 5px rgba(255,255,255,0.7);
+        }
+
+        .sticky-note-title {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sticky-note-summary {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Modal for sticky note detail */
+        .sticky-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .sticky-modal-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.9);
+            animation: popIn 0.3s forwards ease-out;
+            border: 2px solid #3b82f6;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .sticky-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #ef4444;
+            transition: color 0.2s;
+        }
+
+        .sticky-modal-close:hover {
+            color: #b91c1c;
+        }
+
+        .sticky-modal-title {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .sticky-modal-body {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header and Navigation -->
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center flex-wrap">
+            <a href="#" class="text-2xl font-bold text-gray-800 flex items-center">
+                <!-- Logo with tailwind classes for size and margin -->
+                <i class="fa-solid fa-book-open-reader text-blue-500 mr-2 text-3xl"></i>
+                The A's Tales
+            </a>
+            <nav class="flex space-x-4 mt-4 sm:mt-0" id="main-nav">
+                <a href="#" data-tab="home-content" class="nav-link text-gray-600 hover:text-blue-500 transition-colors duration-300 font-medium">Home</a>
+                <a href="#" data-tab="about-content" class="nav-link text-gray-600 hover:text-blue-500 transition-colors duration-300 font-medium">About Me</a>
+                <a href="#" data-tab="documentation-content" class="nav-link text-gray-600 hover:text-blue-500 transition-colors duration-300 font-medium">Documentation</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Banner with a call-to-action button -->
+    <div class="relative bg-gray-500 py-24 sm:py-32 md:py-40 flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('https://placehold.co/1200x600/cbd5e1/475569?text=Student+Portfolio+Banner');">
+        <div class="absolute inset-0 bg-black opacity-50 rounded-b-xl"></div>
+        <div class="relative z-10 text-white p-4">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">A Quiet Space for My Work</h1>
+            <a href="#about-content" data-tab="about-content" class="banner-link-btn bg-blue-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-lg">
+                Learn More About Me
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+        <!-- Home Page Content -->
+        <section id="home-content" class="tab-content active bg-gray-50 py-12">
+            <div class="container mx-auto px-4">
+                <div class="text-center">
+                    <p class="text-xl text-slate-600 max-w-2xl mx-auto">
+                        A curated portfolio of my academic and personal projects, thoughtfully documented and presented.
+                    </p>
+                </div>
+                
+                <!-- Image Slideshow Carousel -->
+                <div class="my-12 relative flex items-center justify-center space-x-4 overflow-hidden carousel-container">
+                    <button id="prev-btn" class="absolute left-0 z-20 p-2 text-gray-800 bg-white rounded-full shadow-lg hover:bg-gray-200 transition-colors duration-200">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    <div id="image-carousel" class="flex items-center justify-center w-full max-w-4xl h-80">
+                        <!-- Images will be populated by JavaScript -->
+                    </div>
+                    
+                    <button id="next-btn" class="absolute right-0 z-20 p-2 text-gray-800 bg-white rounded-full shadow-lg hover:bg-gray-200 transition-colors duration-200">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Highlights Section with 3D Icons -->
+                <div class="my-16 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-12">Highlights</h2>
+                    <div id="icon-highlights" class="flex flex-wrap justify-center items-center w-full max-w-5xl mx-auto">
+                        <!-- Icons will be populated here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Sticky Notes Section -->
+                <div class="sticky-note-container">
+                    <!-- Sticky notes will be populated by JavaScript -->
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- About Me Page Content -->
+        <section id="about-content" class="tab-content py-12">
+            <div class="container mx-auto px-4">
+                <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 lg:p-12 max-w-4xl mx-auto">
+                    <!-- Top Section: Bio and Profile Image -->
+                    <div class="flex flex-col-reverse md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                        <!-- Bio on the left -->
+                        <div class="text-center md:text-left flex-grow">
+                            <h1 class="text-3xl font-bold text-gray-800">John Doe</h1>
+                            <p class="text-slate-500 text-lg">Aspiring Engineer & Creator</p>
+                            <p class="text-slate-700 mt-4 max-w-2xl">
+                                Hello! I am a student passionate about technology, science, and the arts. I love tackling complex problems, building new things, and documenting my progress along the way. This portfolio is a collection of my favorite projects and a reflection of my journey through school.
+                            </p>
+                            <div class="mt-6">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-2">My Skills</h2>
+                                <ul class="flex flex-wrap gap-2 text-sm text-slate-600">
+                                    <li class="bg-slate-100 rounded-full px-3 py-1">Robotics</li>
+                                    <li class="bg-slate-100 rounded-full px-3 py-1">Coding (Python, JavaScript)</li>
+                                    <li class="bg-slate-100 rounded-full px-3 py-1">Data Analysis</li>
+                                    <li class="bg-slate-100 rounded-full px-3 py-1">Creative Writing</li>
+                                    <li class="bg-slate-100 rounded-full px-3 py-1">Public Speaking</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Image on the right -->
+                        <div class="flex-shrink-0">
+                            <img class="w-40 h-40 rounded-full object-cover shadow-sm" src="https://placehold.co/150x150/f1f5f9/94a3b8?text=Profile" alt="Student Profile Picture">
+                        </div>
+                    </div>
+
+                    <div class="w-full h-px bg-gray-200 my-10"></div>
+
+                    <!-- Bottom Section: Image Explanation -->
+                    <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                        <!-- Text on the left -->
+                        <div class="text-center md:text-left flex-grow order-2 md:order-1">
+                            <h2 class="text-2xl font-bold text-gray-800">My Robotics Team</h2>
+                            <p class="text-slate-700 mt-2">
+                                This photo was taken right after our team won the regional robotics challenge. It captures a moment of pure excitement and is a testament to the hard work and collaboration that went into the project. It reminds me of the importance of teamwork and perseverance.
+                            </p>
+                        </div>
+                        <!-- Image on the right -->
+                        <div class="flex-shrink-0 order-1 md:order-2">
+                            <img class="w-full h-auto max-w-md rounded-lg object-cover shadow-md" src="https://placehold.co/400x300/e2e8f0/64748b?text=Team+Photo" alt="Robotics Team Photo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation Page Content -->
+        <section id="documentation-content" class="tab-content py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Project Documentation</h1>
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Documentation Menu -->
+                    <div class="w-full lg:w-1/4">
+                        <!-- Banner Image -->
+                        <img src="https://placehold.co/600x200/94a3b8/e2e8f0?text=My+Projects" alt="Documentation Banner" class="w-full h-auto object-cover rounded-lg mb-6">
+                        
+                        <!-- Icon Grid for Navigation -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6" id="documentation-icons">
+                            <!-- Icons will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Documentation Detail View -->
+                    <div class="w-full lg:w-3/4 bg-white rounded-xl shadow-md p-6">
+                        <div id="project-detail" class="prose max-w-none">
+                            <h2 class="text-2xl font-bold text-gray-800">Select a Project to View Details</h2>
+                            <p class="text-gray-600">Choose a project from the icons above to see its full documentation, including goals, processes, and outcomes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Sticky Note Modal -->
+    <div id="sticky-note-modal" class="sticky-modal">
+        <div class="sticky-modal-content">
+            <span class="sticky-modal-close">&times;</span>
+            <h3 id="modal-title" class="sticky-modal-title"></h3>
+            <p id="modal-body" class="sticky-modal-body"></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-8">
+        <div class="container mx-auto px-4">
+            <!-- Social Media Icons -->
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <i class="fab fa-github fa-2x"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <i class="fab fa-linkedin fa-2x"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <i class="fab fa-twitter fa-2x"></i>
+                </a>
+            </div>
+            <p class="text-sm text-gray-400">"If you are good at something, never do it for free."</p>
+            <p class="text-sm mt-2 text-gray-400">&copy; 2024 My Learning Journey. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Tab Switching and Documentation Content -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const bannerButton = document.querySelector('.banner-link-btn');
+            const documentationIcons = document.getElementById('documentation-icons');
+            const projectDetail = document.getElementById('project-detail');
+            const iconHighlightsContainer = document.getElementById('icon-highlights');
+            const stickyNoteContainer = document.querySelector('.sticky-note-container');
+            const stickyModal = document.getElementById('sticky-note-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.querySelector('.sticky-modal-close');
+            
+            // Documentation data
+            const projects = [
+                {
+                    id: 'robotics-challenge',
+                    title: 'Robotics Challenge: The Maze Runner',
+                    summary: 'This project involved building and programming an autonomous robot to navigate a complex maze. We used Python for the logic and a Raspberry Pi as the brain.',
+                    details: 'Our team of four designed, built, and programmed a robot from scratch. The primary goal was to create a robot that could autonomously find its way from a start point to an end point in a simulated maze. We utilized ultrasonic sensors for obstacle detection and a custom pathfinding algorithm. The project culminated in a presentation and a successful live demonstration at the regional robotics competition, where we secured first place.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Robotics+Project',
+                    icon: 'fa-robot',
+                    shortTitle: 'Robotics'
+                },
+                {
+                    id: 'science-fair',
+                    title: 'Science Fair: Plant Growth Experiment',
+                    summary: 'An experimental study on how different soil pH levels affect the growth rate and health of common basil plants.',
+                    details: 'For this science fair project, I investigated the optimal pH level for basil plant growth. The experiment was conducted over a period of 6 weeks, with daily measurements of plant height and weekly health assessments. The results indicated that a slightly acidic soil pH (around 6.0-6.5) led to the most vigorous growth. The project report included a detailed methodology, data analysis, and conclusions, which earned a "Superior" rating from the judges.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Science+Fair',
+                    icon: 'fa-flask',
+                    shortTitle: 'Science'
+                },
+                {
+                    id: 'creative-writing',
+                    title: 'Creative Writing: The Echoes of Time',
+                    summary: 'A portfolio of fictional short stories and poetry exploring themes of memory, time, and human connection.',
+                    details: 'My creative writing portfolio is a collection of works developed over my English literature course. The centerpiece, a short story titled "The Clockwork Heart," tells the tale of a lonesome watchmaker who discovers a way to mend broken memories. The portfolio was praised for its strong narrative voice and imaginative concepts, leading to its inclusion in the school\'s annual literary magazine.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Writing+Portfolio',
+                    icon: 'fa-pen-ruler',
+                    shortTitle: 'Writing'
+                },
+                {
+                    id: 'math-modeling',
+                    title: 'Math Modeling Competition',
+                    summary: 'A team-based competition where we used mathematical principles to model and solve a real-world problem.',
+                    details: 'Our team chose to model the spread of an infectious disease within a small community. We used differential equations and statistical analysis to predict the disease\'s trajectory and evaluate the effectiveness of various containment strategies. The project required extensive research and collaborative problem-solving, culminating in a detailed report and a presentation to the panel of judges.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Math+Project',
+                    icon: 'fa-square-root-variable',
+                    shortTitle: 'Math'
+                },
+                {
+                    id: 'history-research',
+                    title: 'History Research: The Renaissance Impact',
+                    summary: 'An in-depth research paper on the social and cultural impact of the Italian Renaissance.',
+                    details: 'This project explored the key figures, art, and intellectual movements of the Renaissance period and their lasting effects on modern society. The research involved analyzing primary sources and historical documents. I focused on the transition from the Middle Ages to the early modern period and the shifts in worldview that occurred.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=History+Project',
+                    icon: 'fa-landmark',
+                    shortTitle: 'History'
+                },
+                {
+                    id: 'coding-project',
+                    title: 'Web Development: Personal Portfolio Site',
+                    summary: 'Developing a modern, responsive personal website using HTML, CSS, and JavaScript.',
+                    details: 'This project showcases my skills in front-end web development. I designed the user interface, wrote the HTML structure, styled the components with CSS, and added interactive functionality with JavaScript to create a smooth user experience. The site is fully responsive and works on all devices.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Coding+Project',
+                    icon: 'fa-laptop-code',
+                    shortTitle: 'Coding'
+                },
+                {
+                    id: 'art-portfolio',
+                    title: 'Digital Art: A Study of Light',
+                    summary: 'A collection of digital paintings focusing on different lighting techniques and their effects on mood.',
+                    details: 'This portfolio includes various digital artworks created using a graphics tablet and software like Adobe Photoshop. Each piece was an exercise in capturing light and shadow, with a specific focus on how it can convey different emotions. The project helped me refine my technical skills and develop a stronger artistic voice.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Art+Project',
+                    icon: 'fa-palette',
+                    shortTitle: 'Art'
+                },
+                {
+                    id: 'photography-exhibit',
+                    title: 'Photography Exhibit: Urban Landscapes',
+                    summary: 'A photography series documenting the interplay between natural light and city architecture.',
+                    details: 'For this project, I explored my local city\'s urban environment through a series of photographs. I focused on capturing unique perspectives and the way light interacts with concrete, glass, and steel. The best images were compiled for a small exhibit, showcasing the often-overlooked beauty of urban spaces.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Photography+Project',
+                    icon: 'fa-camera-retro',
+                    shortTitle: 'Photography'
+                },
+                {
+                    id: 'music-composition',
+                    title: 'Music Composition: The Four Seasons',
+                    summary: 'An original musical composition for a string quartet inspired by the changing of seasons.',
+                    details: 'This project was my final for my music theory class. I composed a four-movement piece for a string quartet, with each movement representing a different season. I utilized various musical techniques and harmonies to evoke the emotions and imagery associated with spring, summer, autumn, and winter. The piece was performed by a small ensemble and recorded.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Music+Project',
+                    icon: 'fa-music',
+                    shortTitle: 'Music'
+                },
+                {
+                    id: 'public-speaking',
+                    title: 'Speech & Debate: A Call for Change',
+                    summary: 'A series of persuasive speeches on contemporary social issues.',
+                    details: 'As part of the debate club, I prepared and delivered several speeches on topics ranging from climate change to educational reform. This project helped me hone my research, public speaking, and argumentation skills. I learned how to structure a compelling argument and engage an audience effectively.',
+                    image: 'https://placehold.co/600x400/94a3b8/e2e8f0?text=Debate+Project',
+                    icon: 'fa-microphone',
+                    shortTitle: 'Speaking'
+                }
+            ];
+            
+            // Highlight icons data
+            const highlightIcons = [
+                { iconClass: 'fa-robot', title: 'Robotics', description: 'Building autonomous robots for competition.' },
+                { iconClass: 'fa-flask', title: 'Science', description: 'Investigating plant growth and soil pH levels.' },
+                { iconClass: 'fa-pencil-ruler', title: 'Creative Writing', description: 'Developing a portfolio of award-winning stories.' },
+                { iconClass: 'fa-square-root-variable', title: 'Math Modeling', description: 'Modeling infectious disease spread.' },
+                { iconClass: 'fa-laptop-code', title: 'Web Dev', description: 'Designing and building this portfolio website.' },
+                { iconClass: 'fa-palette', title: 'Digital Art', description: 'Exploring lighting and mood through digital painting.' },
+                { iconClass: 'fa-camera-retro', title: 'Photography', description: 'Documenting urban landscapes and architecture.' }
+            ];
+
+            // Sticky note data
+            const stickyNoteData = [
+                {
+                    id: 'robotics-challenge-note',
+                    title: 'Robotics Challenge',
+                    summary: 'Self-navigating robot project for regional competition.',
+                    details: 'Our team of four designed, built, and programmed a robot from scratch. The primary goal was to create a robot that could autonomously find its way from a start point to an end point in a simulated maze. We utilized ultrasonic sensors for obstacle detection and a custom pathfinding algorithm. The project culminated in a presentation and a successful live demonstration at the regional robotics competition, where we secured first place.',
+                    color: '#fde68a' // Yellow
+                },
+                {
+                    id: 'science-fair-note',
+                    title: 'Science Fair Project',
+                    summary: 'Experimental study on plant growth and soil pH levels.',
+                    details: 'For this science fair project, I investigated the optimal pH level for basil plant growth. The experiment was conducted over a period of 6 weeks, with daily measurements of plant height and weekly health assessments. The results indicated that a slightly acidic soil pH (around 6.0-6.5) led to the most vigorous growth. The project report included a detailed methodology, data analysis, and conclusions, which earned a "Superior" rating from the judges.',
+                    color: '#a7f3d0' // Green
+                },
+                {
+                    id: 'creative-writing-note',
+                    title: 'Creative Writing',
+                    summary: 'A portfolio of short stories and poems recognized for excellence.',
+                    details: 'My creative writing portfolio is a collection of works developed over my English literature course. The centerpiece, a short story titled "The Clockwork Heart," tells the tale of a lonesome watchmaker who discovers a way to mend broken memories. The portfolio was praised for its strong narrative voice and imaginative concepts, leading to its inclusion in the school\'s annual literary magazine.',
+                    color: '#bfdbfe' // Blue
+                }
+            ];
+
+            // Image Carousel Data
+            const carouselImages = [
+                'https://placehold.co/600x400/a8d2e6/1f2937?text=Image+1',
+                'https://placehold.co/600x400/b1c4e8/1f2937?text=Image+2',
+                'https://placehold.co/600x400/c5a8e6/1f2937?text=Image+3',
+                'https://placehold.co/600x400/e6a8d2/1f2937?text=Image+4',
+                'https://placehold.co/600x400/e8c4b1/1f2937?text=Image+5',
+                'https://placehold.co/600x400/e6e6a8/1f2937?text=Image+6'
+            ];
+            let currentImageIndex = 0;
+            let carouselInterval;
+
+            const imageCarousel = document.getElementById('image-carousel');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            // Function to populate the carousel with images
+            const populateCarousel = () => {
+                imageCarousel.innerHTML = '';
+                carouselImages.forEach((src, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'carousel-item flex-shrink-0 w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-in-out';
+                    div.dataset.index = index;
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = `Slideshow Image ${index + 1}`;
+                    img.className = 'w-full h-full object-cover rounded-xl transition-all duration-500 ease-in-out';
+                    div.appendChild(img);
+                    imageCarousel.appendChild(div);
+                });
+            };
+
+            // Function to update the carousel display
+            const updateCarousel = (index) => {
+                const items = document.querySelectorAll('.carousel-item');
+                const len = items.length;
+
+                // Reset all items
+                items.forEach(item => {
+                    item.classList.remove('active', 'carousel-item-prev', 'carousel-item-next');
+                });
+
+                // Get indices for prev and next images, handling wrap-around
+                const prevIndex = (index - 1 + len) % len;
+                const nextIndex = (index + 1) % len;
+
+                // Set active, previous, and next states
+                items[index].classList.add('active');
+                items[prevIndex].classList.add('carousel-item-prev');
+                items[nextIndex].classList.add('carousel-item-next');
+
+                // Adjust the container's transform to center the active item
+                const activeItem = items[index];
+                const offset = activeItem.offsetLeft - (imageCarousel.offsetWidth / 2) + (activeItem.offsetWidth / 2);
+                imageCarousel.style.transform = `translateX(${-offset}px)`;
+            };
+
+            // Function to navigate to the next slide
+            const showNextImage = () => {
+                // The modulo operator (%) ensures the index wraps around
+                currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
+                updateCarousel(currentImageIndex);
+            };
+
+            // Function to navigate to the previous slide
+            const showPrevImage = () => {
+                // The modulo operator (%) ensures the index wraps around
+                currentImageIndex = (currentImageIndex - 1 + carouselImages.length) % carouselImages.length;
+                updateCarousel(currentImageIndex);
+            };
+
+            // Start the auto-play carousel
+            const startCarousel = () => {
+                carouselInterval = setInterval(showNextImage, 5000); // Change image every 5 seconds
+            };
+
+            // Stop the auto-play carousel
+            const stopCarousel = () => {
+                clearInterval(carouselInterval);
+            };
+
+            // Event listeners for carousel navigation
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    stopCarousel();
+                    showPrevImage();
+                    startCarousel();
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    stopCarousel();
+                    showNextImage();
+                    startCarousel();
+                });
+            }
+
+            // Event listener for clicking on a carousel item
+            imageCarousel.addEventListener('click', (e) => {
+                const clickedItem = e.target.closest('.carousel-item');
+                if (clickedItem) {
+                    const newIndex = parseInt(clickedItem.dataset.index, 10);
+                    if (newIndex !== currentImageIndex) {
+                        stopCarousel();
+                        currentImageIndex = newIndex;
+                        updateCarousel(currentImageIndex);
+                        startCarousel();
+                    }
+                }
+            });
+
+            // Function to populate the 3D icons
+            const populateHighlightIcons = () => {
+                iconHighlightsContainer.innerHTML = '';
+                highlightIcons.forEach(item => {
+                    const iconItem = document.createElement('div');
+                    iconItem.className = 'icon-item';
+                    iconItem.innerHTML = `
+                        <div class="icon-wrapper">
+                            <i class="fa-solid ${item.iconClass}"></i>
+                        </div>
+                        <div class="icon-info">
+                            <p class="font-bold">${item.title}</p>
+                            <p class="text-sm text-slate-500">${item.description}</p>
+                        </div>
+                    `;
+                    iconHighlightsContainer.appendChild(iconItem);
+                });
+            };
+
+            // Function to populate the sticky notes
+            const populateStickyNotes = () => {
+                stickyNoteContainer.innerHTML = '';
+                stickyNoteData.forEach(note => {
+                    const noteElement = document.createElement('div');
+                    noteElement.className = 'sticky-note';
+                    noteElement.style.backgroundColor = note.color;
+                    // Apply a random rotation for a "randomly pasted" look
+                    noteElement.style.transform = `rotate(${Math.random() * 6 - 3}deg)`; 
+                    noteElement.dataset.noteId = note.id;
+                    noteElement.innerHTML = `
+                        <h3 class="sticky-note-title">${note.title}</h3>
+                        <p class="sticky-note-summary">${note.summary}</p>
+                    `;
+                    stickyNoteContainer.appendChild(noteElement);
+                });
+            };
+
+            // Tab switching logic
+            const switchTab = (tabId) => {
+                // Remove active class from all tab contents
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to the selected tab content
+                const selectedTab = document.getElementById(tabId);
+                if (selectedTab) {
+                    selectedTab.classList.add('active');
+                }
+                
+                // Update nav link highlighting
+                navLinks.forEach(link => {
+                    if (link.getAttribute('data-tab') === tabId) {
+                        link.classList.add('font-semibold', 'text-blue-500');
+                    } else {
+                        link.classList.remove('font-semibold', 'text-blue-500');
+                    }
+                });
+            };
+
+            // Function to populate the documentation icons
+            const populateIcons = () => {
+                documentationIcons.innerHTML = ''; // Clear previous icons
+                projects.forEach(project => {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.dataset.projectId = project.id;
+                    link.className = 'documentation-icon-link flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 text-gray-800';
+                    link.innerHTML = `
+                        <div class="icon-container w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-gray-100 rounded-full border-2 border-transparent transition-colors duration-200">
+                            <i class="fa-solid ${project.icon} text-2xl sm:text-3xl text-slate-500"></i>
+                        </div>
+                        <span class="mt-2 text-sm text-center font-medium">${project.shortTitle}</span>
+                    `;
+                    documentationIcons.appendChild(link);
+                });
+            };
+
+            // Function to display project details
+            const displayProjectDetail = (projectId) => {
+                const project = projects.find(p => p.id === projectId);
+                if (project) {
+                    projectDetail.innerHTML = `
+                        <img src="${project.image}" alt="${project.title}" class="rounded-lg mb-4 w-full h-auto object-cover shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${project.title}</h2>
+                        <p class="text-gray-700">${project.details}</p>
+                    `;
+                }
+            };
+
+            // Event listeners for main navigation and banner button
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(e.target.dataset.tab);
+                });
+            });
+
+            // Handle the banner button click to switch to About Me tab
+            if (bannerButton) {
+                bannerButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(e.target.dataset.tab);
+                });
+            }
+
+            // Event listener for documentation icon grid
+            documentationIcons.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Find the closest link element
+                const link = e.target.closest('.documentation-icon-link');
+                if (link) {
+                    const projectId = link.dataset.projectId;
+                    displayProjectDetail(projectId);
+
+                    // Update active state of icon links
+                    document.querySelectorAll('.documentation-icon-link').forEach(iconLink => {
+                        iconLink.classList.remove('active');
+                    });
+                    link.classList.add('active');
+                }
+            });
+
+            // Event listener for sticky notes
+            stickyNoteContainer.addEventListener('click', (e) => {
+                const noteElement = e.target.closest('.sticky-note');
+                if (noteElement) {
+                    const noteData = stickyNoteData.find(note => note.id === noteElement.dataset.noteId);
+                    if (noteData) {
+                        modalTitle.textContent = noteData.title;
+                        modalBody.textContent = noteData.details;
+                        stickyModal.style.display = 'flex';
+                        document.body.style.overflow = 'hidden'; // Prevent scrolling
+                    }
+                }
+            });
+
+            // Close modal functionality
+            modalCloseBtn.addEventListener('click', () => {
+                stickyModal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Re-enable scrolling
+            });
+
+            stickyModal.addEventListener('click', (e) => {
+                if (e.target === stickyModal) {
+                    stickyModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Initial setup
+            populateIcons();
+            populateCarousel();
+            populateHighlightIcons();
+            populateStickyNotes();
+            updateCarousel(currentImageIndex);
+            startCarousel();
+            // Initially activate the Home tab link
+            document.querySelector('[data-tab="home-content"]').classList.add('font-semibold', 'text-blue-500');
+        });
+    </script>
+</body>
+</html>
